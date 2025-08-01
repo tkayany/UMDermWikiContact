@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Page</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #2c5aa0;
+        }
+
+        .password-section {
+            display: flex; /* Add this line */
+            flex-direction: column; /* Add this line */
+            align-items: center; /* Add this line */
+            justify-content: center; /* Add this line */
+            margin-bottom: 30px;
+        }
+
+        .password-input {
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-right: 10px;
+            margin-bottom: 15px;
+            width: 200px;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #2c5aa0;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #2c5aa0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1e3d6f;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 13px;
+            font-size: 11px;
+        }
+
+        .btn-edit:hover {
+            background-color: #1e7e34;
+        }
+
+        #content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section {
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #2c5aa0;
+        }
+
+        .section-header {
+            padding: 12px 16px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .section-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .section-content {
+            padding: 0 16px 12px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .section-content.collapsed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .collapse-icon {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c5aa0;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .editable {
+            min-height: 30px;
+            padding: 8px 12px;
+            border: 2px dashed transparent;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: text;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .editable:hover {
+            background-color: #e9ecef;
+        }
+
+        .editable.editing {
+            border-color: #2c5aa0;
+            background-color: white;
+            outline: none;
+        }
+
+        .bullet-line {
+            position: relative;
+            padding-left: 25px;
+            margin: 5px 0;
+        }
+
+        .bullet-line::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            color: #2c5aa0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .edit-controls {
+            display: none;
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .edit-controls.show {
+            display: block;
+        }
+
+        .add-section-btn {
+            background-color: #17a2b8;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .add-section-btn:hover {
+            background-color: #138496;
+        }
+
+        .add-section-btn.show {
+            display: inline-block;
+        }
+
+        .delete-section-btn {
+            background-color: #dc3545;
+            font-size: 12px;
+            padding: 4px 8px;
+            margin-left: 10px;
+            display: none;
+        }
+
+        .delete-section-btn:hover {
+            background-color: #c82333;
+        }
+
+        .delete-section-btn.show {
+            display: inline-block;
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            color: #28a745;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .password-input {
+                width: 100%;
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+
+            .btn-edit {
+                position: static;
+                display: block;
+                margin: 0 auto 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+    <body>
+        <div class="container">
+            <h1>UM DermWiki Contact Information</h1>
+
+            <div class="password-section">
+                <h2>Enter Password</h2>
+                <input type="password" id="password" class="password-input" placeholder="Enter password" />
+                <button onclick="checkPassword()" class="btn">Submit</button>
+                <div id="message"></div>
+            </div>
+
+            <div id="content">
+                <button onclick="toggleEditMode()" class="btn btn-edit" id="editBtn">Edit Mode</button>
+                
+                <button onclick="addNewSection()" class="btn add-section-btn" id="addSectionBtn">Add New Header</button>
+                
+                <div id="sectionsContainer">
+                    <div class="content-section" data-section-id="1">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <h3 class="editable" data-key="heading-1" contenteditable="false">Provider Contact Info</h3>
+                            <span class="collapse-icon">▼</span>
+                            <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
+                        </div>
+                        <div class="section-content">
+                            <p class="editable" data-key="paragraph-1" contenteditable="false">
+                                Welcome to our secure provider portal. Here you can find important contact information and resources for healthcare providers. This information is confidential and should only be accessed by authorized personnel. Please contact our support team if you need additional assistance or have any questions regarding the services provided.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content-section" data-section-id="2">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <h3 class="editable" data-key="heading-2" contenteditable="false">Additional Information</h3>
+                            <span class="collapse-icon">▼</span>
+                            <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
+                        </div>
+                        <div class="section-content">
+                            <p class="editable" data-key="paragraph-2" contenteditable="false">
+                                This section can be customized to include any additional information relevant to your organization. Use the edit mode to modify content as needed. All changes are automatically saved to your browser's local storage.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-controls" id="editControls">
+                    <button onclick="saveChanges()" class="btn">Save Changes</button>
+                    <button onclick="cancelEdit()" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isEditMode = false;
+        let originalContent = {};
+        let sectionCounter = 2; // Start from 3 since we have 2 default sections
+        const correctPassword = "derm2025";
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Allow Enter key to submit password
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+
+        // Password validation function
+        function checkPassword() {
+            const input = document.getElementById("password").value;
+            const messageDiv = document.getElementById("message");
+            
+            if (input === correctPassword) {
+                document.getElementById("content").style.display = "block";
+                document.querySelector(".password-section").style.display = "none";
+                showMessage("Access granted!", "success");
+                loadContentFromDatabase();
+            } else {
+                showMessage("Incorrect password. Please try again.", "error");
+                document.getElementById("password").value = "";
+                document.getElementById("password").focus();
+            }
+        }
+
+        // Show success or error messages
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById("message");
+            messageDiv.textContent = text;
+            messageDiv.className = type === "success" ? "success-message" : "error-message";
+            
+            setTimeout(() => {
+                messageDiv.textContent = "";
+                messageDiv.className = "";
+            }, 3000);
+        }
+
+        // Toggle collapsible sections
+        async function toggleSection(headerElement) {
+            // Prevent toggle when clicking delete button or in edit mode on editable elements
+            if (event.target.classList.contains('delete-section-btn') || 
+                (event.target.classList.contains('editable') && isEditMode)) {
+                return;
+            }
+            
+            const content = headerElement.nextElementSibling;
+            const icon = headerElement.querySelector('.collapse-icon');
+            const section = headerElement.closest('.content-section');
+            const sectionId = section.getAttribute('data-section-id');
+            
+            const isCurrentlyCollapsed = content.classList.contains('collapsed');
+            const newCollapsedState = !isCurrentlyCollapsed;
+            
+            if (isCurrentlyCollapsed) {
+                content.classList.remove('collapsed');
+                icon.classList.remove('collapsed');
+                icon.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                icon.classList.add('collapsed');
+                icon.textContent = '▶';
+            }
+            
+            // Save collapsed state to database
+            try {
+                await fetch(`/api/sections/${sectionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        isCollapsed: newCollapsedState
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving collapsed state:', error);
+            }
+        }
+
+        // Add new section
+        async function addNewSection() {
+            sectionCounter++;
+            
+            try {
+                const response = await fetch('/api/sections', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sectionId: sectionCounter.toString(),
+                        heading: 'New Header',
+                        content: 'Enter your content here. Click Edit Mode to modify this text.',
+                        isCollapsed: false,
+                        sortOrder: sectionCounter
+                    })
+                });
+                
+                if (response.ok) {
+                    const newSectionData = await response.json();
+                    createSectionFromData(newSectionData);
+                    
+                    // If in edit mode, make new elements editable
+                    if (isEditMode) {
+                        const newSection = document.querySelector(`[data-section-id="${sectionCounter}"]`);
+                        const editableElements = newSection.querySelectorAll('.editable');
+                        editableElements.forEach(element => {
+                            element.contentEditable = "true";
+                            element.classList.add("editing");
+                        });
+                        newSection.querySelector('.delete-section-btn').classList.add('show');
+                    }
+                    
+                    showMessage("New section added!", "success");
+                } else {
+                    showMessage("Error adding new section", "error");
+                }
+            } catch (error) {
+                console.error('Error adding new section:', error);
+                showMessage("Error adding new section", "error");
+            }
+        }
+
+        // Delete section
+        async function deleteSection(buttonElement) {
+            event.stopPropagation(); // Prevent section toggle
+            const section = buttonElement.closest('.content-section');
+            const sectionId = section.getAttribute('data-section-id');
+            
+            if (confirm('Are you sure you want to delete this section?')) {
+                try {
+                    const response = await fetch(`/api/sections/${sectionId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        section.remove();
+                        showMessage("Section deleted!", "success");
+                    } else {
+                        showMessage("Error deleting section", "error");
+                    }
+                } catch (error) {
+                    console.error('Error deleting section:', error);
+                    showMessage("Error deleting section", "error");
+                }
+            }
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            const editBtn = document.getElementById("editBtn");
+            const editControls = document.getElementById("editControls");
+            const addSectionBtn = document.getElementById("addSectionBtn");
+            const editableElements = document.querySelectorAll(".editable");
+            const deleteButtons = document.querySelectorAll(".delete-section-btn");
+            
+            if (!isEditMode) {
+                // Enter edit mode
+                isEditMode = true;
+                editBtn.textContent = "Exit Edit Mode";
+                editBtn.style.backgroundColor = "#dc3545";
+                editControls.classList.add("show");
+                addSectionBtn.classList.add("show");
+                
+                // Store original content
+                editableElements.forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    originalContent[key] = element.innerHTML;
+                    element.contentEditable = "true";
+                    element.classList.add("editing");
+                });
+                
+                // Show delete buttons
+                deleteButtons.forEach(btn => btn.classList.add("show"));
+                
+                showMessage("Edit mode enabled. Click on any text to modify it.", "success");
+            } else {
+                // Exit edit mode without saving
+                exitEditMode();
+            }
+        }
+
+        // Exit edit mode
+        function exitEditMode() {
+            isEditMode = false;
+            const editBtn = document.getElementById("editBtn");
+            const editControls = document.getElementById("editControls");
+            const addSectionBtn = document.getElementById("addSectionBtn");
+            const editableElements = document.querySelectorAll(".editable");
+            const deleteButtons = document.querySelectorAll(".delete-section-btn");
+            
+            editBtn.textContent = "Edit Mode";
+            editBtn.style.backgroundColor = "#28a745";
+            editControls.classList.remove("show");
+            addSectionBtn.classList.remove("show");
+            
+            editableElements.forEach(element => {
+                element.contentEditable = "false";
+                element.classList.remove("editing");
+            });
+            
+            // Hide delete buttons
+            deleteButtons.forEach(btn => btn.classList.remove("show"));
+        }
+
+        // Save changes to database
+        async function saveChanges() {
+            const editableElements = document.querySelectorAll(".editable");
+            const updates = [];
+            
+            editableElements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                const sectionId = key.split('-')[1];
+                const fieldType = key.split('-')[0];
+                
+                if (fieldType === 'heading') {
+                    updates.push({
+                        sectionId: sectionId,
+                        heading: element.innerHTML
+                    });
+                } else if (fieldType === 'paragraph') {
+                    const existingUpdate = updates.find(u => u.sectionId === sectionId);
+                    if (existingUpdate) {
+                        existingUpdate.content = element.innerHTML;
+                    } else {
+                        updates.push({
+                            sectionId: sectionId,
+                            content: element.innerHTML
+                        });
+                    }
+                }
+            });
+            
+            try {
+                // Combine updates for the same section
+                const combinedUpdates = updates.reduce((acc, update) => {
+                    const existing = acc.find(u => u.sectionId === update.sectionId);
+                    if (existing) {
+                        Object.assign(existing, update);
+                    } else {
+                        acc.push(update);
+                    }
+                    return acc;
+                }, []);
+                
+                // Send updates to database
+                const updatePromises = combinedUpdates.map(update => 
+                    fetch(`/api/sections/${update.sectionId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(update)
+                    })
+                );
+                
+                const responses = await Promise.all(updatePromises);
+                const allSuccessful = responses.every(response => response.ok);
+                
+                if (allSuccessful) {
+                    showMessage("Changes saved successfully!", "success");
+                    exitEditMode();
+                } else {
+                    showMessage("Error saving some changes. Please try again.", "error");
+                }
+            } catch (error) {
+                showMessage("Error saving changes. Please try again.", "error");
+                console.error('Error saving to database:', error);
+            }
+        }
+
+        // Cancel edit and restore original content
+        function cancelEdit() {
+            const editableElements = document.querySelectorAll(".editable");
+            
+            editableElements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (originalContent[key]) {
+                    element.innerHTML = originalContent[key];
+                }
+            });
+            
+            exitEditMode();
+            showMessage("Changes cancelled.", "success");
+        }
+
+        // Load content from database
+        async function loadContentFromDatabase() {
+            try {
+                const response = await fetch('/api/sections');
+                if (response.ok) {
+                    const sections = await response.json();
+                    
+                    if (sections.length > 0) {
+                        const container = document.getElementById('sectionsContainer');
+                        container.innerHTML = ''; // Clear existing content only if we have database content
+                        
+                        sections.forEach(section => {
+                            createSectionFromData(section);
+                            if (parseInt(section.sectionId) > sectionCounter) {
+                                sectionCounter = parseInt(section.sectionId);
+                            }
+                        });
+                    } else {
+                        // No sections in database, keep default content but sync it to database
+                        syncDefaultContentToDatabase();
+                    }
+                } else {
+                    console.error('Failed to load sections from database');
+                    showMessage("Error loading content from database", "error");
+                }
+            } catch (error) {
+                console.error('Error loading content from database:', error);
+                showMessage("Error connecting to database", "error");
+            }
+        }
+
+        // Sync default content to database if database is empty
+        async function syncDefaultContentToDatabase() {
+            const defaultSections = document.querySelectorAll('.content-section');
+            
+            for (let section of defaultSections) {
+                const sectionId = section.getAttribute('data-section-id');
+                const heading = section.querySelector('.editable[data-key^="heading"]').textContent;
+                const content = section.querySelector('.editable[data-key^="paragraph"]').textContent;
+                
+                try {
+                    await fetch('/api/sections', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sectionId: sectionId,
+                            heading: heading,
+                            content: content,
+                            isCollapsed: false,
+                            sortOrder: parseInt(sectionId)
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error syncing default content:', error);
+                }
+            }
+        }
+        
+        // Create a section from database data
+        function createSectionFromData(sectionData) {
+            const container = document.getElementById('sectionsContainer');
+            
+            const newSection = document.createElement('div');
+            newSection.className = 'content-section';
+            newSection.setAttribute('data-section-id', sectionData.sectionId);
+            
+            const collapseClass = sectionData.isCollapsed ? 'collapsed' : '';
+            const iconText = sectionData.isCollapsed ? '▶' : '▼';
+            const iconClass = sectionData.isCollapsed ? 'collapsed' : '';
+            
+            // Ensure we have fallback content if database content is empty
+            const heading = sectionData.heading || 'New Header';
+            const content = sectionData.content || 'Enter your content here.';
+            
+            newSection.innerHTML = `
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3 class="editable" data-key="heading-${sectionData.sectionId}" contenteditable="false">${heading}</h3>
+                    <span class="collapse-icon ${iconClass}">${iconText}</span>
+                    <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
+                </div>
+                <div class="section-content ${collapseClass}">
+                    <p class="editable" data-key="paragraph-${sectionData.sectionId}" contenteditable="false">${content}</p>
+                </div>
+            `;
+            
+            container.appendChild(newSection);
+        }
+
+        // Handle bullet point formatting and keyboard events
+        document.addEventListener('keydown', function(e) {
+            if (e.target.classList.contains('editable')) {
+                handleEditableKeydown(e);
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('editable')) {
+                handleEditableInput(e);
+            }
+        });
+
+        function handleEditableKeydown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleEnterKey(e.target);
+            } else if (e.key === 'Backspace') {
+                handleBackspaceKey(e);
+            }
+        }
+
+        function handleEditableInput(e) {
+            const element = e.target;
+            
+            // Simple bullet point detection and replacement
+            setTimeout(() => {
+                formatBulletPoints(element);
+            }, 0);
+        }
+
+        function formatBulletPoints(element) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            
+            let html = element.innerHTML;
+            const originalHtml = html;
+            
+            // Convert "- " at start of line or after <br> to bullet format
+            html = html.replace(/(^|<br\s*\/?>|<div>)(\s*)- /g, '$1$2<span class="bullet-line">');
+            
+            // Ensure all bullet lines are properly closed before line breaks
+            html = html.replace(/(<span class="bullet-line">[^<]*?)(<br|<div|$)/g, '$1</span>$2');
+            
+            // Clean up any double spans
+            html = html.replace(/<\/span><span class="bullet-line">/g, '');
+            
+            if (html !== originalHtml) {
+                const range = selection.getRangeAt(0);
+                const offset = range.startOffset;
+                const container = range.startContainer;
+                
+                element.innerHTML = html;
+                
+                // Try to restore cursor position
+                try {
+                    const newRange = document.createRange();
+                    if (container.parentNode && element.contains(container.parentNode)) {
+                        newRange.setStart(container, Math.min(offset, container.textContent.length));
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                    } else {
+                        // Place cursor at end if we can't restore position
+                        newRange.selectNodeContents(element);
+                        newRange.collapse(false);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                    }
+                } catch (error) {
+                    // Fallback: place cursor at end
+                    const newRange = document.createRange();
+                    newRange.selectNodeContents(element);
+                    newRange.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+            }
+        }
+        
+        function getTextOffsetFromRange(element, range) {
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let offset = 0;
+            let node;
+            
+            while (node = walker.nextNode()) {
+                if (node === range.startContainer) {
+                    return offset + range.startOffset;
+                }
+                offset += node.textContent.length;
+            }
+            
+            return offset;
+        }
+        
+        function restoreCursorPosition(element, targetOffset) {
+            const selection = window.getSelection();
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let currentOffset = 0;
+            let node;
+            
+            while (node = walker.nextNode()) {
+                const nodeLength = node.textContent.length;
+                if (currentOffset + nodeLength >= targetOffset) {
+                    const range = document.createRange();
+                    range.setStart(node, Math.min(targetOffset - currentOffset, nodeLength));
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    return;
+                }
+                currentOffset += nodeLength;
+            }
+            
+            // Fallback: place cursor at end
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        function handleEnterKey(element) {
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            
+            // Check if we're inside a bullet line span
+            let currentNode = range.startContainer;
+            let bulletSpan = null;
+            
+            // Traverse up to find bullet-line span
+            while (currentNode && currentNode !== element) {
+                if (currentNode.nodeType === Node.ELEMENT_NODE && 
+                    currentNode.classList && currentNode.classList.contains('bullet-line')) {
+                    bulletSpan = currentNode;
+                    break;
+                }
+                currentNode = currentNode.parentNode;
+            }
+            
+            if (bulletSpan) {
+                // Create new bullet line
+                document.execCommand('insertHTML', false, '<br><span class="bullet-line">&nbsp;</span>');
+                
+                // Move cursor into the new bullet span
+                setTimeout(() => {
+                    const spans = element.querySelectorAll('.bullet-line');
+                    const lastSpan = spans[spans.length - 1];
+                    if (lastSpan) {
+                        const newRange = document.createRange();
+                        newRange.setStart(lastSpan.firstChild, 1);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+                    }
+                }, 0);
+            } else {
+                // Normal line break
+                document.execCommand('insertHTML', false, '<br>');
+            }
+        }
+
+        function handleBackspaceKey(e) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            
+            const range = selection.getRangeAt(0);
+            const element = e.target;
+            
+            // Check if we're at the beginning of a bullet line
+            let currentNode = range.startContainer;
+            let bulletSpan = null;
+            
+            while (currentNode && currentNode !== element) {
+                if (currentNode.nodeType === Node.ELEMENT_NODE && 
+                    currentNode.classList && currentNode.classList.contains('bullet-line')) {
+                    bulletSpan = currentNode;
+                    break;
+                }
+                currentNode = currentNode.parentNode;
+            }
+            
+            if (bulletSpan && range.startOffset === 0) {
+                const bulletText = bulletSpan.textContent.trim();
+                
+                // If bullet line is empty or only has nbsp, remove bullet formatting
+                if (bulletText === '' || bulletText === '\u00A0') {
+                    e.preventDefault();
+                    
+                    // Replace bullet span with regular text
+                    const textNode = document.createTextNode('');
+                    bulletSpan.parentNode.replaceChild(textNode, bulletSpan);
+                    
+                    // Place cursor at the new position
+                    const newRange = document.createRange();
+                    newRange.setStart(textNode, 0);
+                    newRange.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+            }
+        }
+
+        function getTextNodes(node) {
+            const textNodes = [];
+            
+            function traverse(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    textNodes.push(node);
+                } else {
+                    for (let child of node.childNodes) {
+                        traverse(child);
+                    }
+                }
+            }
+            
+            traverse(node);
+            return textNodes;
+        }
+    </script>
+</body>
+</html>
