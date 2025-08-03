@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protected Page</title>
+    <title>UM DermWiki Contact Information</title>
     <style>
         * {
             box-sizing: border-box;
@@ -55,10 +55,10 @@
         }
 
         .password-section {
-            display: flex; /* Add this line */
-            flex-direction: column; /* Add this line */
-            align-items: center; /* Add this line */
-            justify-content: center; /* Add this line */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 30px;
         }
 
@@ -284,67 +284,81 @@
         }
     </style>
 </head>
-    <body>
-        <div class="container">
-            <h1>UM DermWiki Contact Information</h1>
+<body>
+    <div class="container">
+        <h1>UM DermWiki Contact Information</h1>
 
-            <div class="password-section">
-                <h2>Enter Password</h2>
-                <input type="password" id="password" class="password-input" placeholder="Enter password" />
-                <button onclick="checkPassword()" class="btn">Submit</button>
-                <div id="message"></div>
+        <div class="password-section">
+            <h2>Enter Password</h2>
+            <input type="password" id="password" class="password-input" placeholder="Enter password" />
+            <button onclick="checkPassword()" class="btn">Submit</button>
+            <div id="message"></div>
+        </div>
+
+        <div id="content">
+            <button onclick="toggleEditMode()" class="btn btn-edit" id="editBtn">Edit Mode</button>
+            
+            <button onclick="addNewSection()" class="btn add-section-btn" id="addSectionBtn">Add New Header</button>
+            
+            <div id="sectionsContainer">
+                <!-- Sections will be loaded from localStorage or default content -->
             </div>
 
-            <div id="content">
-                <button onclick="toggleEditMode()" class="btn btn-edit" id="editBtn">Edit Mode</button>
-                
-                <button onclick="addNewSection()" class="btn add-section-btn" id="addSectionBtn">Add New Header</button>
-                
-                <div id="sectionsContainer">
-                    <div class="content-section" data-section-id="1">
-                        <div class="section-header" onclick="toggleSection(this)">
-                            <h3 class="editable" data-key="heading-1" contenteditable="false">Provider Contact Info</h3>
-                            <span class="collapse-icon">▼</span>
-                            <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
-                        </div>
-                        <div class="section-content">
-                            <p class="editable" data-key="paragraph-1" contenteditable="false">
-                                Welcome to our secure provider portal. Here you can find important contact information and resources for healthcare providers. This information is confidential and should only be accessed by authorized personnel. Please contact our support team if you need additional assistance or have any questions regarding the services provided.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="content-section" data-section-id="2">
-                        <div class="section-header" onclick="toggleSection(this)">
-                            <h3 class="editable" data-key="heading-2" contenteditable="false">Additional Information</h3>
-                            <span class="collapse-icon">▼</span>
-                            <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
-                        </div>
-                        <div class="section-content">
-                            <p class="editable" data-key="paragraph-2" contenteditable="false">
-                                This section can be customized to include any additional information relevant to your organization. Use the edit mode to modify content as needed. All changes are automatically saved to your browser's local storage.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="edit-controls" id="editControls">
-                    <button onclick="saveChanges()" class="btn">Save Changes</button>
-                    <button onclick="cancelEdit()" class="btn btn-secondary">Cancel</button>
-                </div>
+            <div class="edit-controls" id="editControls">
+                <button onclick="saveChanges()" class="btn">Save Changes</button>
+                <button onclick="cancelEdit()" class="btn btn-secondary">Cancel</button>
             </div>
+        </div>
     </div>
 
     <script>
         // Global variables
         let isEditMode = false;
         let originalContent = {};
-        let sectionCounter = 2; // Start from 3 since we have 2 default sections
+        let sectionCounter = 0;
         const correctPassword = "derm2025";
+
+        // Default sections data
+        const defaultSections = [
+            {
+                id: '1',
+                heading: 'Dermatology Clinic Administrator',
+                content: '<span class="bullet-line">Carol Becker 734-615-8199</span>',
+                collapsed: false
+            },
+            {
+                id: '2', 
+                heading: 'Taubman Clinic',
+                content: `<b>Clinic Manager</b> – Kari Smith 6-7022 (TC), pager 36656
+
+<b>Taubman Clinical Support Staff (6-4054 call center or 6-4055 TC MA desk)</b><br><span class="bullet-line">Beth Porter, MA Lab Monitoring (offsite)</span><br><span class="bullet-line">&nbsp;</span>Dawn Graham, MA Specialist Lead<br><span class="bullet-line">Heather Puro, MA Scribe</span><br><span class="bullet-line">&nbsp;</span>Janie Osak, MA Scribe<br><span class="bullet-line">Dustina Hall, MA</span><br><span class="bullet-line">&nbsp;</span>Quartez Vickerson, MA<br><span class="bullet-line">Mendy Ball, LPN</span><br><span class="bullet-line">&nbsp;</span>Ashley Kidd, LPN<br><span class="bullet-line">Vanessa Kusak, LPN</span><br><span class="bullet-line">&nbsp;</span>Jennifer Pieknick, LPN<br><span class="bullet-line">Kaitlyn Henry, Pharm Tech for non-infusion med PAs (offsite)</span><br><span class="bullet-line">&nbsp;</span>Kelly Miller, Pharm Tech for non-infusion pharmacy PAs (offsite)
+
+<b>Taubman- Front Desk Staff</b><br><span class="bullet-line">Jamie Yerebeck, PSA Lead</span><br><span class="bullet-line">&nbsp;</span>Libby Plank<br><span class="bullet-line">Katie Hall</span><br><span class="bullet-line">&nbsp;</span>Sherry Murrell
+
+<b>Call Center Schedulers - (work offsite) 6-4054</b><br><span class="bullet-line">Claudette Peterson (Supervisor)</span><br><span class="bullet-line">&nbsp;</span>Kellen Taylor (Lead)<br><span class="bullet-line">Kim Poches</span><br><span class="bullet-line">&nbsp;</span>Gretchen Quinn<br><span class="bullet-line">Sarah Primm</span><br><span class="bullet-line">&nbsp;</span>Hailey Johnson<br><span class="bullet-line">Chelsea Chafin</span><br><span class="bullet-line">&nbsp;</span>Keyana Weathers<br><span class="bullet-line">Areon Johnson</span><br><span class="bullet-line">&nbsp;</span>Talisha Warren<br><span class="bullet-line">Thomas Kerschbaum</span>`,
+                collapsed: true
+            },
+            {
+                id: '3',
+                heading: 'Dominos Farms Clinic', 
+                content: `<b>Address</b>
+24 Frank Lloyd Wright Drive
+Lobby H, Suite 2350 
+Ann Arbor, Michigan 48105-5751
+
+<b>DF Clinic Manager</b> – Eric Dockus Pager 36656<br><span class="bullet-line">Administrative issues, urgent requests, insurance requirements, questions related to scheduling, clinic patient issues/concerns
+
+<b>DF Clinic MA Lead</b> - Anthony Gardette (232-2297)<br><span class="bullet-line">&nbsp;</span>Administrative issues, urgent requests, clinic patient issues/concerns
+
+<b>DF Clinical Support Staff</b><br><span class="bullet-line">&nbsp;</span>Anthony Gardette, CMA Specialist Lead<br><span class="bullet-line">&nbsp;</span>Ashley Carey, MA<br><span class="bullet-line">&nbsp;</span>Anne Kozak , MA<br><span class="bullet-line">&nbsp;</span>Alex Shultz, MA<br><span class="bullet-line">&nbsp;</span>Abigail Stodart, MA
+
+<b>Dominos Farms Patient Services Assistants and Associates</b> Located at check in and check out (6-4054 call center, front desk 232-2210)<br><span class="bullet-line">&nbsp;</span>Nicole Zaher, PSA Lead <br><span class="bullet-line">&nbsp;</span>Jenni Jacobsen <br><span class="bullet-line">&nbsp;</span>Chuck Hayes <br><span class="bullet-line">&nbsp;</span>Jennifer Knight <br><span class="bullet-line">&nbsp;</span>Arika Smith</span>`,
+                collapsed: true
+            }
+        ];
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // Allow Enter key to submit password
             document.getElementById('password').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     checkPassword();
@@ -361,12 +375,98 @@
                 document.getElementById("content").style.display = "block";
                 document.querySelector(".password-section").style.display = "none";
                 showMessage("Access granted!", "success");
-                loadContentFromDatabase();
+                loadContent();
             } else {
                 showMessage("Incorrect password. Please try again.", "error");
                 document.getElementById("password").value = "";
                 document.getElementById("password").focus();
             }
+        }
+
+        // Load content from localStorage or use defaults
+        function loadContent() {
+            const savedSections = localStorage.getItem('dermwiki-sections');
+            let sections;
+            
+            if (savedSections) {
+                try {
+                    sections = JSON.parse(savedSections);
+                } catch (error) {
+                    console.error('Error parsing saved sections:', error);
+                    sections = defaultSections;
+                }
+            } else {
+                sections = defaultSections;
+                saveToLocalStorage(sections);
+            }
+            
+            renderSections(sections);
+            sectionCounter = Math.max(...sections.map(s => parseInt(s.id)));
+        }
+
+        // Render sections in the DOM
+        function renderSections(sections) {
+            const container = document.getElementById('sectionsContainer');
+            container.innerHTML = '';
+            
+            sections.forEach(section => {
+                createSectionElement(section);
+            });
+        }
+
+        // Create a section element
+        function createSectionElement(sectionData) {
+            const container = document.getElementById('sectionsContainer');
+            const section = document.createElement('div');
+            section.className = 'content-section';
+            section.setAttribute('data-section-id', sectionData.id);
+            
+            const collapseClass = sectionData.collapsed ? 'collapsed' : '';
+            const iconText = sectionData.collapsed ? '▶' : '▼';
+            const iconClass = sectionData.collapsed ? 'collapsed' : '';
+            
+            section.innerHTML = `
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h3 class="editable" data-key="heading-${sectionData.id}" contenteditable="false">${sectionData.heading}</h3>
+                    <span class="collapse-icon ${iconClass}">${iconText}</span>
+                    <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
+                </div>
+                <div class="section-content ${collapseClass}">
+                    <p class="editable" data-key="paragraph-${sectionData.id}" contenteditable="false">${sectionData.content}</p>
+                </div>
+            `;
+            
+            container.appendChild(section);
+        }
+
+        // Save sections to localStorage
+        function saveToLocalStorage(sections = null) {
+            if (!sections) {
+                sections = getCurrentSections();
+            }
+            localStorage.setItem('dermwiki-sections', JSON.stringify(sections));
+        }
+
+        // Get current sections from DOM
+        function getCurrentSections() {
+            const sections = [];
+            const sectionElements = document.querySelectorAll('.content-section');
+            
+            sectionElements.forEach(element => {
+                const id = element.getAttribute('data-section-id');
+                const heading = element.querySelector(`[data-key="heading-${id}"]`).innerHTML;
+                const content = element.querySelector(`[data-key="paragraph-${id}"]`).innerHTML;
+                const collapsed = element.querySelector('.section-content').classList.contains('collapsed');
+                
+                sections.push({
+                    id: id,
+                    heading: heading,
+                    content: content,
+                    collapsed: collapsed
+                });
+            });
+            
+            return sections;
         }
 
         // Show success or error messages
@@ -382,8 +482,7 @@
         }
 
         // Toggle collapsible sections
-        async function toggleSection(headerElement) {
-            // Prevent toggle when clicking delete button or in edit mode on editable elements
+        function toggleSection(headerElement) {
             if (event.target.classList.contains('delete-section-btn') || 
                 (event.target.classList.contains('editable') && isEditMode)) {
                 return;
@@ -391,13 +490,8 @@
             
             const content = headerElement.nextElementSibling;
             const icon = headerElement.querySelector('.collapse-icon');
-            const section = headerElement.closest('.content-section');
-            const sectionId = section.getAttribute('data-section-id');
             
-            const isCurrentlyCollapsed = content.classList.contains('collapsed');
-            const newCollapsedState = !isCurrentlyCollapsed;
-            
-            if (isCurrentlyCollapsed) {
+            if (content.classList.contains('collapsed')) {
                 content.classList.remove('collapsed');
                 icon.classList.remove('collapsed');
                 icon.textContent = '▼';
@@ -407,142 +501,47 @@
                 icon.textContent = '▶';
             }
             
-            // Save collapsed state to database (if API available)
-            const apiAvailable = await checkAPIAvailability();
-            if (apiAvailable) {
-                try {
-                    await fetch(`/api/sections/${sectionId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            isCollapsed: newCollapsedState
-                        })
-                    });
-                } catch (error) {
-                    console.error('Error saving collapsed state:', error);
-                }
-            }
+            // Save state
+            saveToLocalStorage();
         }
 
         // Add new section
-        async function addNewSection() {
-            const apiAvailable = await checkAPIAvailability();
+        function addNewSection() {
             sectionCounter++;
             
-            if (apiAvailable) {
-                try {
-                    const response = await fetch('/api/sections', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            sectionId: sectionCounter.toString(),
-                            heading: 'New Header',
-                            content: 'Enter your content here. Click Edit Mode to modify this text.',
-                            isCollapsed: false,
-                            sortOrder: sectionCounter
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        const newSectionData = await response.json();
-                        createSectionFromData(newSectionData);
-                        
-                        // If in edit mode, make new elements editable
-                        if (isEditMode) {
-                            const newSection = document.querySelector(`[data-section-id="${sectionCounter}"]`);
-                            const editableElements = newSection.querySelectorAll('.editable');
-                            editableElements.forEach(element => {
-                                element.contentEditable = "true";
-                                element.classList.add("editing");
-                            });
-                            newSection.querySelector('.delete-section-btn').classList.add('show');
-                        }
-                        
-                        showMessage("New section added!", "success");
-                    } else {
-                        showMessage("Error adding new section", "error");
-                    }
-                } catch (error) {
-                    console.error('Error adding new section:', error);
-                    showMessage("Error adding new section", "error");
-                }
-            } else {
-                // Static mode - add section locally only
-                addSectionLocally();
-            }
-        }
-        
-        // Add section locally (for static mode)
-        function addSectionLocally() {
-            const container = document.getElementById('sectionsContainer');
+            const newSection = {
+                id: sectionCounter.toString(),
+                heading: 'New Header',
+                content: 'Enter your content here. Click Edit Mode to modify this text.',
+                collapsed: false
+            };
             
-            const newSection = document.createElement('div');
-            newSection.className = 'content-section';
-            newSection.setAttribute('data-section-id', sectionCounter.toString());
-            
-            newSection.innerHTML = `
-                <div class="section-header" onclick="toggleSection(this)">
-                    <h3 class="editable" data-key="heading-${sectionCounter}" contenteditable="false">New Header</h3>
-                    <span class="collapse-icon">▼</span>
-                    <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
-                </div>
-                <div class="section-content">
-                    <p class="editable" data-key="paragraph-${sectionCounter}" contenteditable="false">
-                        Enter your content here. Click Edit Mode to modify this text.
-                    </p>
-                </div>
-            `;
-            
-            container.appendChild(newSection);
+            createSectionElement(newSection);
             
             // If in edit mode, make new elements editable
             if (isEditMode) {
-                const editableElements = newSection.querySelectorAll('.editable');
+                const newSectionElement = document.querySelector(`[data-section-id="${sectionCounter}"]`);
+                const editableElements = newSectionElement.querySelectorAll('.editable');
                 editableElements.forEach(element => {
                     element.contentEditable = "true";
                     element.classList.add("editing");
                 });
-                newSection.querySelector('.delete-section-btn').classList.add('show');
+                newSectionElement.querySelector('.delete-section-btn').classList.add('show');
             }
             
-            showMessage("New section added locally!", "success");
+            saveToLocalStorage();
+            showMessage("New section added!", "success");
         }
 
         // Delete section
-        async function deleteSection(buttonElement) {
-            event.stopPropagation(); // Prevent section toggle
+        function deleteSection(buttonElement) {
+            event.stopPropagation();
             const section = buttonElement.closest('.content-section');
-            const sectionId = section.getAttribute('data-section-id');
             
             if (confirm('Are you sure you want to delete this section?')) {
-                const apiAvailable = await checkAPIAvailability();
-                
-                if (apiAvailable) {
-                    try {
-                        const response = await fetch(`/api/sections/${sectionId}`, {
-                            method: 'DELETE'
-                        });
-                        
-                        if (response.ok) {
-                            section.remove();
-                            showMessage("Section deleted!", "success");
-                        } else {
-                            showMessage("Error deleting section", "error");
-                        }
-                    } catch (error) {
-                        console.error('Error deleting section:', error);
-                        section.remove();
-                        showMessage("Section deleted locally!", "success");
-                    }
-                } else {
-                    // Static mode - just remove from DOM
-                    section.remove();
-                    showMessage("Section deleted locally!", "success");
-                }
+                section.remove();
+                saveToLocalStorage();
+                showMessage("Section deleted!", "success");
             }
         }
 
@@ -603,70 +602,11 @@
             deleteButtons.forEach(btn => btn.classList.remove("show"));
         }
 
-        // Save changes to database
-        async function saveChanges() {
-            const editableElements = document.querySelectorAll(".editable");
-            const updates = [];
-            
-            editableElements.forEach(element => {
-                const key = element.getAttribute('data-key');
-                const sectionId = key.split('-')[1];
-                const fieldType = key.split('-')[0];
-                
-                if (fieldType === 'heading') {
-                    updates.push({
-                        sectionId: sectionId,
-                        heading: element.innerHTML
-                    });
-                } else if (fieldType === 'paragraph') {
-                    const existingUpdate = updates.find(u => u.sectionId === sectionId);
-                    if (existingUpdate) {
-                        existingUpdate.content = element.innerHTML;
-                    } else {
-                        updates.push({
-                            sectionId: sectionId,
-                            content: element.innerHTML
-                        });
-                    }
-                }
-            });
-            
-            try {
-                // Combine updates for the same section
-                const combinedUpdates = updates.reduce((acc, update) => {
-                    const existing = acc.find(u => u.sectionId === update.sectionId);
-                    if (existing) {
-                        Object.assign(existing, update);
-                    } else {
-                        acc.push(update);
-                    }
-                    return acc;
-                }, []);
-                
-                // Send updates to database
-                const updatePromises = combinedUpdates.map(update => 
-                    fetch(`/api/sections/${update.sectionId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(update)
-                    })
-                );
-                
-                const responses = await Promise.all(updatePromises);
-                const allSuccessful = responses.every(response => response.ok);
-                
-                if (allSuccessful) {
-                    showMessage("Changes saved successfully!", "success");
-                    exitEditMode();
-                } else {
-                    showMessage("Error saving some changes. Please try again.", "error");
-                }
-            } catch (error) {
-                showMessage("Error saving changes. Please try again.", "error");
-                console.error('Error saving to database:', error);
-            }
+        // Save changes
+        function saveChanges() {
+            saveToLocalStorage();
+            exitEditMode();
+            showMessage("Changes saved successfully!", "success");
         }
 
         // Cancel edit and restore original content
@@ -682,367 +622,6 @@
             
             exitEditMode();
             showMessage("Changes cancelled.", "success");
-        }
-
-        // Check if API is available
-        async function checkAPIAvailability() {
-            try {
-                const response = await fetch('/api/sections');
-                return response.ok || response.status === 404; // API exists even if no sections
-            } catch (error) {
-                return false; // API not available
-            }
-        }
-
-        // Load content from database or localStorage
-        async function loadContentFromDatabase() {
-            const apiAvailable = await checkAPIAvailability();
-            
-            if (apiAvailable) {
-                try {
-                    const response = await fetch('/api/sections');
-                    if (response.ok) {
-                        const sections = await response.json();
-                        
-                        if (sections.length > 0) {
-                            const container = document.getElementById('sectionsContainer');
-                            container.innerHTML = ''; // Clear existing content only if we have database content
-                            
-                            sections.forEach(section => {
-                                createSectionFromData(section);
-                                if (parseInt(section.sectionId) > sectionCounter) {
-                                    sectionCounter = parseInt(section.sectionId);
-                                }
-                            });
-                        } else {
-                            // No sections in database, keep default content but sync it to database
-                            syncDefaultContentToDatabase();
-                        }
-                    } else {
-                        console.log('Database empty, using default content');
-                        syncDefaultContentToDatabase();
-                    }
-                } catch (error) {
-                    console.error('Error loading content from database:', error);
-                    loadFromLocalStorage();
-                }
-            } else {
-                console.log('API not available, falling back to localStorage');
-                loadFromLocalStorage();
-            }
-        }
-        
-        // Fallback: Load from localStorage
-        function loadFromLocalStorage() {
-            const savedContent = localStorage.getItem('pageContent');
-            if (savedContent) {
-                try {
-                    const contentData = JSON.parse(savedContent);
-                    const editableElements = document.querySelectorAll('.editable');
-                    
-                    editableElements.forEach(element => {
-                        const key = element.getAttribute('data-key');
-                        if (contentData[key]) {
-                            element.innerHTML = contentData[key];
-                        }
-                    });
-                    
-                    showMessage("Content loaded from local storage", "success");
-                } catch (error) {
-                    console.error('Error loading from localStorage:', error);
-                }
-            }
-        }
-
-        // Sync default content to database if database is empty
-        async function syncDefaultContentToDatabase() {
-            const defaultSections = document.querySelectorAll('.content-section');
-            
-            for (let section of defaultSections) {
-                const sectionId = section.getAttribute('data-section-id');
-                const heading = section.querySelector('.editable[data-key^="heading"]').textContent;
-                const content = section.querySelector('.editable[data-key^="paragraph"]').textContent;
-                
-                try {
-                    await fetch('/api/sections', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            sectionId: sectionId,
-                            heading: heading,
-                            content: content,
-                            isCollapsed: false,
-                            sortOrder: parseInt(sectionId)
-                        })
-                    });
-                } catch (error) {
-                    console.error('Error syncing default content:', error);
-                }
-            }
-        }
-        
-        // Create a section from database data
-        function createSectionFromData(sectionData) {
-            const container = document.getElementById('sectionsContainer');
-            
-            const newSection = document.createElement('div');
-            newSection.className = 'content-section';
-            newSection.setAttribute('data-section-id', sectionData.sectionId);
-            
-            const collapseClass = sectionData.isCollapsed ? 'collapsed' : '';
-            const iconText = sectionData.isCollapsed ? '▶' : '▼';
-            const iconClass = sectionData.isCollapsed ? 'collapsed' : '';
-            
-            // Ensure we have fallback content if database content is empty
-            const heading = sectionData.heading || 'New Header';
-            const content = sectionData.content || 'Enter your content here.';
-            
-            newSection.innerHTML = `
-                <div class="section-header" onclick="toggleSection(this)">
-                    <h3 class="editable" data-key="heading-${sectionData.sectionId}" contenteditable="false">${heading}</h3>
-                    <span class="collapse-icon ${iconClass}">${iconText}</span>
-                    <button onclick="deleteSection(this)" class="btn delete-section-btn">Delete</button>
-                </div>
-                <div class="section-content ${collapseClass}">
-                    <p class="editable" data-key="paragraph-${sectionData.sectionId}" contenteditable="false">${content}</p>
-                </div>
-            `;
-            
-            container.appendChild(newSection);
-        }
-
-        // Handle bullet point formatting and keyboard events
-        document.addEventListener('keydown', function(e) {
-            if (e.target.classList.contains('editable')) {
-                handleEditableKeydown(e);
-            }
-        });
-
-        document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('editable')) {
-                handleEditableInput(e);
-            }
-        });
-
-        function handleEditableKeydown(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleEnterKey(e.target);
-            } else if (e.key === 'Backspace') {
-                handleBackspaceKey(e);
-            }
-        }
-
-        function handleEditableInput(e) {
-            const element = e.target;
-            
-            // Simple bullet point detection and replacement
-            setTimeout(() => {
-                formatBulletPoints(element);
-            }, 0);
-        }
-
-        function formatBulletPoints(element) {
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-            
-            let html = element.innerHTML;
-            const originalHtml = html;
-            
-            // Convert "- " at start of line or after <br> to bullet format
-            html = html.replace(/(^|<br\s*\/?>|<div>)(\s*)- /g, '$1$2<span class="bullet-line">');
-            
-            // Ensure all bullet lines are properly closed before line breaks
-            html = html.replace(/(<span class="bullet-line">[^<]*?)(<br|<div|$)/g, '$1</span>$2');
-            
-            // Clean up any double spans
-            html = html.replace(/<\/span><span class="bullet-line">/g, '');
-            
-            if (html !== originalHtml) {
-                const range = selection.getRangeAt(0);
-                const offset = range.startOffset;
-                const container = range.startContainer;
-                
-                element.innerHTML = html;
-                
-                // Try to restore cursor position
-                try {
-                    const newRange = document.createRange();
-                    if (container.parentNode && element.contains(container.parentNode)) {
-                        newRange.setStart(container, Math.min(offset, container.textContent.length));
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                    } else {
-                        // Place cursor at end if we can't restore position
-                        newRange.selectNodeContents(element);
-                        newRange.collapse(false);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                    }
-                } catch (error) {
-                    // Fallback: place cursor at end
-                    const newRange = document.createRange();
-                    newRange.selectNodeContents(element);
-                    newRange.collapse(false);
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                }
-            }
-        }
-        
-        function getTextOffsetFromRange(element, range) {
-            const walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            let offset = 0;
-            let node;
-            
-            while (node = walker.nextNode()) {
-                if (node === range.startContainer) {
-                    return offset + range.startOffset;
-                }
-                offset += node.textContent.length;
-            }
-            
-            return offset;
-        }
-        
-        function restoreCursorPosition(element, targetOffset) {
-            const selection = window.getSelection();
-            const walker = document.createTreeWalker(
-                element,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            let currentOffset = 0;
-            let node;
-            
-            while (node = walker.nextNode()) {
-                const nodeLength = node.textContent.length;
-                if (currentOffset + nodeLength >= targetOffset) {
-                    const range = document.createRange();
-                    range.setStart(node, Math.min(targetOffset - currentOffset, nodeLength));
-                    range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                    return;
-                }
-                currentOffset += nodeLength;
-            }
-            
-            // Fallback: place cursor at end
-            const range = document.createRange();
-            range.selectNodeContents(element);
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-
-        function handleEnterKey(element) {
-            const selection = window.getSelection();
-            const range = selection.getRangeAt(0);
-            
-            // Check if we're inside a bullet line span
-            let currentNode = range.startContainer;
-            let bulletSpan = null;
-            
-            // Traverse up to find bullet-line span
-            while (currentNode && currentNode !== element) {
-                if (currentNode.nodeType === Node.ELEMENT_NODE && 
-                    currentNode.classList && currentNode.classList.contains('bullet-line')) {
-                    bulletSpan = currentNode;
-                    break;
-                }
-                currentNode = currentNode.parentNode;
-            }
-            
-            if (bulletSpan) {
-                // Create new bullet line
-                document.execCommand('insertHTML', false, '<br><span class="bullet-line">&nbsp;</span>');
-                
-                // Move cursor into the new bullet span
-                setTimeout(() => {
-                    const spans = element.querySelectorAll('.bullet-line');
-                    const lastSpan = spans[spans.length - 1];
-                    if (lastSpan) {
-                        const newRange = document.createRange();
-                        newRange.setStart(lastSpan.firstChild, 1);
-                        newRange.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(newRange);
-                    }
-                }, 0);
-            } else {
-                // Normal line break
-                document.execCommand('insertHTML', false, '<br>');
-            }
-        }
-
-        function handleBackspaceKey(e) {
-            const selection = window.getSelection();
-            if (!selection.rangeCount) return;
-            
-            const range = selection.getRangeAt(0);
-            const element = e.target;
-            
-            // Check if we're at the beginning of a bullet line
-            let currentNode = range.startContainer;
-            let bulletSpan = null;
-            
-            while (currentNode && currentNode !== element) {
-                if (currentNode.nodeType === Node.ELEMENT_NODE && 
-                    currentNode.classList && currentNode.classList.contains('bullet-line')) {
-                    bulletSpan = currentNode;
-                    break;
-                }
-                currentNode = currentNode.parentNode;
-            }
-            
-            if (bulletSpan && range.startOffset === 0) {
-                const bulletText = bulletSpan.textContent.trim();
-                
-                // If bullet line is empty or only has nbsp, remove bullet formatting
-                if (bulletText === '' || bulletText === '\u00A0') {
-                    e.preventDefault();
-                    
-                    // Replace bullet span with regular text
-                    const textNode = document.createTextNode('');
-                    bulletSpan.parentNode.replaceChild(textNode, bulletSpan);
-                    
-                    // Place cursor at the new position
-                    const newRange = document.createRange();
-                    newRange.setStart(textNode, 0);
-                    newRange.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                }
-            }
-        }
-
-        function getTextNodes(node) {
-            const textNodes = [];
-            
-            function traverse(node) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    textNodes.push(node);
-                } else {
-                    for (let child of node.childNodes) {
-                        traverse(child);
-                    }
-                }
-            }
-            
-            traverse(node);
-            return textNodes;
         }
     </script>
 </body>
